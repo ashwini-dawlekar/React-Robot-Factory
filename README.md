@@ -1,7 +1,7 @@
 # Steps to run React-Robot-Factory
 Change your directory to server
 npm install
-num start
+npm start
 
 Change your directory to client
 npm install
