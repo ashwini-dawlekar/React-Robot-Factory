@@ -1,0 +1,136 @@
+import * as React from 'react';
+import * as _ from 'lodash';
+import { ADD_TO_FACTORY_SECOND, ADD_TO_QA_PASS } from '../actions/index';
+
+export default class QAComplete extends React.Component <any, any>{
+  renderRobotsList(category) {
+    const factorySecondRobots = this.props.robots.filter(robot => {
+      return _.indexOf(robot.qaCategory, category) > -1 && !robot.shipped;
+    });
+
+    return factorySecondRobots.map(robot => {
+      const config = {
+        sentience: robot.configuration.hasSentience ? 'Yes' : 'No',
+        wheels: robot.configuration.hasWheels ? 'Yes' : 'No',
+        tracks: robot.configuration.hasTracks ? 'Yes' : 'No'
+      };
+      return(
+        <tr key={robot.id}>
+          <td>{robot.id}</td>
+          <td>{robot.name}</td>
+          <td>{config.sentience}</td>
+          <td>{config.wheels}</td>
+          <td>{config.tracks}</td>
+          <td>{robot.configuration.numberOfRotors}</td>
+          <td>{_.capitalize(robot.configuration.Colour)}</td>
+          <td><input type="button" className="btn btn-success" value="Add To Shipment" onClick={() => {this.props.addToShipping(robot)}} /></td>
+        </tr>
+      );
+    });
+  }
+
+  renderShippingList() {
+    const shippedRobotsList = this.props.robots.filter(robot => robot.shipped);
+
+    return shippedRobotsList.map(robot => {
+      const config = {
+        sentience: robot.configuration.hasSentience ? 'Yes' : 'No',
+        wheels: robot.configuration.hasWheels ? 'Yes' : 'No',
+        tracks: robot.configuration.hasTracks ? 'Yes' : 'No'
+      };
+      return(
+        <tr key={robot.id}>
+          <td>{robot.id}</td>
+          <td>{robot.name}</td>
+          <td>{config.sentience}</td>
+          <td>{config.wheels}</td>
+          <td>{config.tracks}</td>
+          <td>{robot.configuration.numberOfRotors}</td>
+          <td>{_.capitalize(robot.configuration.Colour)}</td>
+          <td><input type="button" className="btn btn-danger" value="Remove From Shipment" onClick={() => {this.props.removeFromShipping(robot)}} /></td>
+        </tr>
+      );
+    });
+  }
+
+  renderSendShipmentButton() {
+    const shippedRobotsList = this.props.robots.filter(robot => robot.shipped);
+    if (shippedRobotsList.length > 0) {
+      return(
+        <input type="button" className="btn btn-primary" value="Send Shipment" onClick={()=>{this.sendShipment()}}/>
+      );
+    }
+  }
+
+  sendShipment() {
+    const shippedRobotsList = this.props.robots.filter(robot => robot.shipped);
+    const idOfShippedRobots = shippedRobotsList.map(robot => {
+      return robot.id;
+    });
+    this.props.createNewShipment(idOfShippedRobots);
+  }
+
+  render() {
+    return(
+      <div className="shipping-list">
+        <h2>Factory Seconds</h2>
+        <table className="table table-default">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Sentience</th>
+              <th>Wheels</th>
+              <th>Tracks</th>
+              <th>Rotors</th>
+              <th>Color</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            { this.renderRobotsList(ADD_TO_FACTORY_SECOND) }
+          </tbody>
+        </table>
+
+        <h2>QA Passed</h2>
+        <table className="table table-default">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Sentience</th>
+              <th>Wheels</th>
+              <th>Tracks</th>
+              <th>Rotors</th>
+              <th>Color</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            { this.renderRobotsList(ADD_TO_QA_PASS) }
+          </tbody>
+        </table>
+
+        <h2>Ready To Ship</h2>
+        <table className="table table-default">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Sentience</th>
+              <th>Wheels</th>
+              <th>Tracks</th>
+              <th>Rotors</th>
+              <th>Color</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            { this.renderShippingList() }
+          </tbody>
+        </table>
+        {this.renderSendShipmentButton()}
+      </div>
+    );
+  }
+}
